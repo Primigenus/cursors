@@ -2,6 +2,15 @@ Cursors = new Meteor.Collection("cursors");
 
 if (Meteor.isClient) {
 
+  Meteor.startup(function() {
+
+    Session.setDefault("date", new Date());
+    Meteor.setInterval(function() {
+      Session.set("date", new Date());
+    }, 1000);
+
+  })
+
   UI.body.events({
     "mousemove #body": function(evt) {
       var x = evt.clientX;
@@ -17,7 +26,7 @@ if (Meteor.isClient) {
   });
 
   Template.cursors.cursor = function() {
-    return Cursors.find();
+    return Cursors.find({lastSeen: {$gte: new Date(new Date() - 1000 * 42)}});
   }
   Template.cursors.fill = function() {
     var stringHexNumber = (
@@ -33,7 +42,9 @@ if (Meteor.isClient) {
     return Meteor.connection._lastSessionId === this._id;
   }
   Template.cursors.opacity = function() {
-    var age = (+new Date() - +this.lastSeen) / 1000;
+    if (Meteor.connection._lastSessionId === this._id)
+      return 1;
+    var age = (+Session.get("date") - +this.lastSeen) / 1000;
     if (age > 30) return 0;
     if (age > 20) return 0.3;
     if (age > 10) return 0.5;
@@ -42,12 +53,14 @@ if (Meteor.isClient) {
     return 1;
   }
   Template.cursors.blur = function() {
-    var age = (+new Date() - +this.lastSeen) / 1000;
-    if (age > 30) return 3;
-    if (age > 20) return 2;
-    if (age > 10) return 1;
-    if (age > 5)  return 0.7;
-    if (age > 2)  return 0.3;
+    if (Meteor.connection._lastSessionId === this._id)
+      return 0;
+    var age = (+Session.get("date") - +this.lastSeen) / 1000;
+    if (age > 30) return 10;
+    if (age > 20) return 7;
+    if (age > 10) return 4;
+    if (age > 5)  return 2;
+    if (age > 2)  return 1;
     return 0;
   }
 
@@ -71,5 +84,11 @@ if (Meteor.isServer) {
     Meteor.setInterval(function() {
       Cursors.remove({lastSeen: {$lt: new Date(new Date() - 1000 * 3600)}})
     }, 10000)
+  });
+
+  Meteor.methods({
+    clear: function() {
+      Cursors.remove({});
+    }
   })
 }

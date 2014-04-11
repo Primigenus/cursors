@@ -11,12 +11,20 @@ html, body {
   font-size: 11px;
   cursor: none;
 }
+#logo img {
+  position: absolute;
+  z-index: 1;
+  height: 80px;
+  bottom: 30px; left: 30px;
+  pointer-events: none;
+}
 
 .c {
   position: absolute;
+  z-index: 99;
   pointer-events: none;
   width: 28px; height: 40px;
-/*  -webkit-transition: ease-out -webkit-transform .1s;*/
+  -webkit-transition: ease-out -webkit-filter 1s;
 }
 
 .fill {
