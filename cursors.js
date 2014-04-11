@@ -2,15 +2,11 @@ Cursors = new Meteor.Collection("cursors");
 
 if (Meteor.isClient) {
 
-  Meteor.startup(function() {
-    Session.setDefault("sessionId", Meteor.connection._lastSessionId);
-  })
-
   UI.body.events({
     "mousemove #body": function(evt) {
       var x = evt.clientX;
       var y = evt.clientY;
-      var sessionId = Session.get("sessionId");
+      var sessionId = Meteor.connection._lastSessionId;
       var lastSeen = new Date();
       var c = Cursors.findOne(sessionId);
       if (c)
@@ -34,7 +30,7 @@ if (Meteor.isClient) {
     return stringHexNumber;
   }
   Template.cursors.isMyCursor = function() {
-    return Session.equals("sessionId", this._id);
+    return Meteor.connection._lastSessionId === this._id;
   }
   Template.cursors.opacity = function() {
     var age = (+new Date() - +this.lastSeen) / 1000;
