@@ -1,0 +1,15 @@
+<head>
+  <title>cursors</title>
+</head>
+
+<body>
+  <div id="body">
+    {{> cursors}}
+  </div>
+</body>
+
+<template name="cursors">
+  {{#each cursor}}
+    <div class="c" style="-webkit-transform: translateX({{x}}px) translateY({{y}}px)"></div>
+  {{/each}}
+</template>
