@@ -7,6 +7,7 @@
     {{> cursors}}
   </div>
   <div id="logo"><img src="http://static.q42.nl/images/q42-logo.svg"></div>
+  {{> name}}
 </body>
 
 <template name="cursors">
@@ -27,6 +28,11 @@
           </g>
         </g>
       </svg>
+      <div class="name">{{name}}</div>
     </div>
   {{/each}}
+</template>
+
+<template name="name">
+  <div id="name"><input type="text" placeholder="Your name?" value="{{name}}"></div>
 </template>
