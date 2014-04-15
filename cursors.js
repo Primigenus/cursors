@@ -1,4 +1,5 @@
 Cursors = new Meteor.Collection("cursors");
+Gradients = new Meteor.Collection("gradients");
 
 if (Meteor.isClient) {
 
@@ -11,7 +12,7 @@ if (Meteor.isClient) {
       });
     }, 1000);
 
-  })
+  });
 
   UI.body.events({
     "mousemove #body": function(evt) {
@@ -27,30 +28,47 @@ if (Meteor.isClient) {
     },
     "mousedown #body": function(evt) {
       var sessionId = Meteor.connection._lastSessionId;
+      var lastSeen = new Date();
       var c = Cursors.findOne(sessionId);
       if (c)
-        Cursors.update(sessionId, {$set: {clicking: true}});
+        Cursors.update(sessionId, {$set: {clicking: true, lastSeen: lastSeen}});
+
+      var fill = window.fill(sessionId);
+      var x = evt.clientX - 100;
+      var y = evt.clientY - 100;
+      Gradients.insert({createdOn: new Date(), x: x, y: y, fill: fill});
     },
     "mouseup #body": function(evt) {
       var sessionId = Meteor.connection._lastSessionId;
+      var lastSeen = new Date();
       var c = Cursors.findOne(sessionId);
       if (c)
-        Cursors.update(sessionId, {$set: {clicking: false}});
+        Cursors.update(sessionId, {$set: {clicking: false, lastSeen: lastSeen}});
     }
   });
+
+  Template.gradients.gradient = function() {
+    return Gradients.find();
+  }
+  Template.gradients.opacity = function() {
+    var age = (+Session.get("date") - +this.createdOn) / 1000;
+    if (age > 30) return 0;
+    if (age > 25) return 0.1;
+    if (age > 20) return 0.15;
+    if (age > 10) return 0.2;
+    if (age > 5)  return 0.25;
+    if (age > 2)  return 0.3;
+    return 0.35;
+  }
+  Template.gradients.delay = function() {
+    return Math.random() * 5;
+  }
 
   Template.cursors.cursor = function() {
     return Cursors.find({lastSeen: {$gte: new Date(new Date() - 1000 * 42)}});
   }
   Template.cursors.fill = function() {
-    var stringHexNumber = (
-        parseInt(
-            parseInt(this._id, 36)
-                .toExponential()
-                .slice(2,-5)
-        , 10) & 0xFFFFFF
-    ).toString(16).toUpperCase();
-    return stringHexNumber;
+    return fill(this._id);
   }
   Template.cursors.isMyCursor = function() {
     return Meteor.connection._lastSessionId === this._id;
@@ -76,15 +94,14 @@ if (Meteor.isClient) {
 
   var justClickedToh;
   Template.cursors.clicking = function() {
-    var clicking = Meteor.connection._lastSessionId === this._id && this.clicking;
-    if (clicking) {
+    if (this.clicking) {
       var $c = $(".id-" + this._id);
       $c.addClass("just-clicked");
       justClickedToh = Meteor.setTimeout(function() {
         $c.removeClass("just-clicked");
       }, 200);
     }
-    return clicking ? "clicking" : "";
+    return Meteor.connection._lastSessionId === this._id && this.clicking ? "clicking" : "";
   }
 
   String.prototype.hashCode = function() {
@@ -105,13 +122,15 @@ if (Meteor.isServer) {
       Cursors.remove({});
     }
     Meteor.setInterval(function() {
-      Cursors.remove({lastSeen: {$lt: new Date(new Date() - 1000 * 3600)}})
+      Cursors.remove({lastSeen: {$lt: new Date(new Date() - 1000 * 3600)}});
+      Gradients.remove({createdOn: {$lt: new Date(new Date() - 1000 * 300)}});
     }, 10000)
   });
 
   Meteor.methods({
     clear: function() {
       Cursors.remove({});
+      Gradients.remove({});
     },
     getServerTime: function () {
       return new Date();

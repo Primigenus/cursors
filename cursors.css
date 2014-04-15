@@ -7,7 +7,7 @@ html, body {
 }
 #body {
   width: 100%; height: 100%;
-  background: -webkit-radial-gradient(closest-corner,rgba(16,47,70,0) 60%,rgba(16,47,70,0.26)),-webkit-linear-gradient(108deg,#2E5E8A,#91209B 90%);
+  background: -webkit-radial-gradient(closest-corner,rgba(16,47,70,0) 60%,rgba(16,47,70,0.26)),-webkit-linear-gradient(108deg,#7F8A2E,#91209B 90%);
   color: white;
   -webkit-font-smoothing: antialiased;
   font-size: 11px;
@@ -18,7 +18,6 @@ html, body {
   z-index: 1;
   height: 80px;
   bottom: 30px; left: 30px;
-  pointer-events: none;
 }
 
 .c {
@@ -48,4 +47,11 @@ html, body {
 @-webkit-keyframes expandFade {
   from { -webkit-transform: scale(0.3); opacity: 1; -webkit-transform-origin: center center;}
   to { -webkit-transform: scale(1); opacity: 0; }
+}
+
+.gradient {
+  width: 200px; height: 200px;
+  position: absolute;
+  opacity: .2;
+  -webkit-transition: opacity linear 1s;
 }
