@@ -6,7 +6,9 @@ if (Meteor.isClient) {
 
     Session.setDefault("date", new Date());
     Meteor.setInterval(function() {
-      Session.set("date", new Date());
+      Meteor.call("getServerTime", function(err, res) {
+        Session.set("date", res);
+      });
     }, 1000);
 
   })
@@ -56,12 +58,7 @@ if (Meteor.isClient) {
     if (Meteor.connection._lastSessionId === this._id)
       return 0;
     var age = (+Session.get("date") - +this.lastSeen) / 1000;
-    if (age > 30) return 10;
-    if (age > 20) return 7;
-    if (age > 10) return 4;
-    if (age > 5)  return 2;
-    if (age > 2)  return 1;
-    return 0;
+    return ~~(age / 3);
   }
 
   String.prototype.hashCode = function() {
@@ -89,6 +86,9 @@ if (Meteor.isServer) {
   Meteor.methods({
     clear: function() {
       Cursors.remove({});
+    },
+    getServerTime: function () {
+      return new Date();
     }
   })
 }
