@@ -24,6 +24,18 @@ if (Meteor.isClient) {
         Cursors.update(sessionId, {$set: {x: x, y: y, lastSeen: lastSeen}});
       else
         Cursors.insert({_id: sessionId, x: x, y: y, lastSeen: lastSeen});
+    },
+    "mousedown #body": function(evt) {
+      var sessionId = Meteor.connection._lastSessionId;
+      var c = Cursors.findOne(sessionId);
+      if (c)
+        Cursors.update(sessionId, {$set: {clicking: true}});
+    },
+    "mouseup #body": function(evt) {
+      var sessionId = Meteor.connection._lastSessionId;
+      var c = Cursors.findOne(sessionId);
+      if (c)
+        Cursors.update(sessionId, {$set: {clicking: false}});
     }
   });
 
@@ -48,6 +60,7 @@ if (Meteor.isClient) {
       return 1;
     var age = (+Session.get("date") - +this.lastSeen) / 1000;
     if (age > 30) return 0;
+    if (age > 25) return 0.15;
     if (age > 20) return 0.3;
     if (age > 10) return 0.5;
     if (age > 5)  return 0.8;
@@ -59,6 +72,19 @@ if (Meteor.isClient) {
       return 0;
     var age = (+Session.get("date") - +this.lastSeen) / 1000;
     return ~~(age / 3);
+  }
+
+  var justClickedToh;
+  Template.cursors.clicking = function() {
+    var clicking = Meteor.connection._lastSessionId === this._id && this.clicking;
+    if (clicking) {
+      var $c = $(".id-" + this._id);
+      $c.addClass("just-clicked");
+      justClickedToh = Meteor.setTimeout(function() {
+        $c.removeClass("just-clicked");
+      }, 200);
+    }
+    return clicking ? "clicking" : "";
   }
 
   String.prototype.hashCode = function() {
