@@ -21,7 +21,7 @@
 
 <template name="gradients">
   {{#each gradient}}
-    <div class="gradient" style="background: -webkit-radial-gradient(closest-corner, #{{fill}} 10%, transparent 50%); -webkit-transform: translateX({{x}}px) translateY({{y}}px); opacity: {{opacity}}; -webkit-transition-delay: {{delay}}s"></div>
+    <div class="gradient" style="background: -webkit-radial-gradient(closest-corner, #{{fill}} 10%, transparent 50%); -webkit-transform: translateX({{x}}px) translateY({{y}}px); opacity: {{opacity}};"></div>
   {{/each}}
 </template>
 
@@ -73,6 +73,7 @@
         </g>
       </svg>
       <div class="animation ripple"><div></div></div>
+      <div class="name">{{name}}</div>
     </div>
   {{/each}}
 </template>
