@@ -11,7 +11,7 @@
 </head>
 
 <body>
-  <div id="body">
+  <div id="body" style="background-color: #{{fill}}">
     {{> cursors}}
     {{> gradients}}
   </div>
@@ -21,7 +21,7 @@
 
 <template name="gradients">
   {{#each gradient}}
-    <div class="gradient" style="background: -webkit-radial-gradient(closest-corner, #{{fill}} 10%, transparent 50%); -webkit-transform: translateX({{x}}px) translateY({{y}}px); opacity: {{opacity}};"></div>
+    <div class="gradient" style="background: -webkit-radial-gradient(closest-corner, #{{fill}}, #{{fill}} 10%, transparent 70%); -webkit-transform: translateX({{x}}px) translateY({{y}}px); opacity: {{opacity}};"></div>
   {{/each}}
 </template>
 

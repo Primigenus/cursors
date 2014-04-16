@@ -4,17 +4,21 @@ Gradients = new Meteor.Collection("gradients");
 if (Meteor.isClient) {
 
   Meteor.startup(function() {
-
     $("#name input").focus();
-
     Session.setDefault("date", new Date());
     Meteor.setInterval(function() {
       Meteor.call("getServerTime", function(err, res) {
         Session.set("date", res);
       });
     }, 1000);
-
   });
+
+  UI.body.fill = function() {
+    var sessionId = Meteor.connection._lastSessionId;
+    var date = Session.get('date');
+    var fill = window.fill(sessionId, +date);
+    return fill;
+  }
 
   UI.body.events({
     "mousemove #body": function(evt) {
@@ -24,37 +28,34 @@ if (Meteor.isClient) {
 
       var x = evt.clientX;
       var y = evt.clientY;
-      var lastSeen = Session.get("date");
       var c = Cursors.findOne(sessionId);
       if (c)
-        Cursors.update(sessionId, {$set: {x: x, y: y, lastSeen: lastSeen}});
+        Meteor.call("updateCursor", sessionId, x, y);
       else
-        Cursors.insert({_id: sessionId, x: x, y: y, lastSeen: lastSeen});
+        Meteor.call("createCursor", sessionId, x, y);
     },
     "mousedown #body": function(evt) {
       var sessionId = Meteor.connection._lastSessionId;
       if (!sessionId)
         return;
 
-      var lastSeen = Session.get("date");
       var c = Cursors.findOne(sessionId);
       if (c)
-        Cursors.update(sessionId, {$set: {clicking: true, lastSeen: lastSeen}});
+        Meteor.call("updateCursorClick", sessionId, true);
 
       var fill = window.fill(sessionId);
       var x = evt.clientX - 100;
       var y = evt.clientY - 100;
-      Gradients.insert({createdOn: Session.get("date"), x: x, y: y, fill: fill});
+      Meteor.call("createGradient", sessionId, x, y, fill)
     },
     "mouseup #body": function(evt) {
       var sessionId = Meteor.connection._lastSessionId;
       if (!sessionId)
         return;
 
-      var lastSeen = Session.get("date");
       var c = Cursors.findOne(sessionId);
       if (c)
-        Cursors.update(sessionId, {$set: {clicking: false, lastSeen: lastSeen}});
+        Meteor.call("updateCursorClick", sessionId, false);
     }
   });
 
@@ -63,7 +64,7 @@ if (Meteor.isClient) {
       var sessionId = Meteor.connection._lastSessionId;
       if (!sessionId)
         return;
-      Cursors.update(sessionId, {$set: {name: $(evt.target).val()}});
+      Meteor.call("updateCursorName", sessionId, $(evt.target).val());
     }
   });
   Template.name.name = function() {
@@ -92,6 +93,9 @@ if (Meteor.isClient) {
   }
   Template.cursors.isMyCursor = function() {
     return Meteor.connection._lastSessionId === this._id;
+  }
+  Template.cursors.name = function() {
+    return this.name;
   }
   Template.cursors.opacity = function() {
     if (Meteor.connection._lastSessionId === this._id)
@@ -151,6 +155,21 @@ if (Meteor.isServer) {
     },
     getServerTime: function () {
       return new Date();
+    },
+    updateCursor: function(sessionId, x, y) {
+      Cursors.update(sessionId, {$set: {x: x, y: y, lastSeen: new Date()}})
+    },
+    updateCursorClick: function(sessionId, clicking) {
+      Cursors.update(sessionId, {$set: {clicking: clicking, lastSeen: new Date()}});
+    },
+    updateCursorName: function(sessionId, name) {
+      Cursors.update(sessionId, {$set: {name: name}});
+    },
+    createCursor: function(sessionId, x, y) {
+      Cursors.insert({_id: sessionId, x: x, y: y, lastSeen: new Date()});
+    },
+    createGradient: function(sessionId, x, y, fill) {
+      Gradients.insert({createdBy: sessionId, createdOn: new Date(), x: x, y: y, fill: fill});
     }
   })
 }
