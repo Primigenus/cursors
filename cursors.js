@@ -166,7 +166,8 @@ if (Meteor.isServer) {
       Cursors.update(sessionId, {$set: {name: name}});
     },
     createCursor: function(sessionId, x, y) {
-      Cursors.insert({_id: sessionId, x: x, y: y, lastSeen: new Date()});
+      if (!Cursors.findOne(sessionId))
+        Cursors.insert({_id: sessionId, x: x, y: y, lastSeen: new Date()});
     },
     createGradient: function(sessionId, x, y, fill) {
       Gradients.insert({createdBy: sessionId, createdOn: new Date(), x: x, y: y, fill: fill});
