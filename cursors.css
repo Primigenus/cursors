@@ -36,6 +36,9 @@ html, body {
   position: absolute;
   top: 7px; left: 100%;
   font: 12px "Helvetica Neue", Helvetica, Arial, sans-serif;
+  width: 100px;
+  white-space: nowrap;
+  overflow: hidden;
 }
 
 .c {
