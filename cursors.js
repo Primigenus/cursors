@@ -5,6 +5,8 @@ if (Meteor.isClient) {
 
   Meteor.startup(function() {
 
+    $("#name input").focus();
+
     Session.setDefault("date", new Date());
     Meteor.setInterval(function() {
       Meteor.call("getServerTime", function(err, res) {
