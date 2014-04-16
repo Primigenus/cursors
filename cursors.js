@@ -16,10 +16,13 @@ if (Meteor.isClient) {
 
   UI.body.events({
     "mousemove #body": function(evt) {
+      var sessionId = Meteor.connection._lastSessionId;
+      if (!sessionId)
+        return;
+
       var x = evt.clientX;
       var y = evt.clientY;
-      var sessionId = Meteor.connection._lastSessionId;
-      var lastSeen = new Date();
+      var lastSeen = Session.get("date");
       var c = Cursors.findOne(sessionId);
       if (c)
         Cursors.update(sessionId, {$set: {x: x, y: y, lastSeen: lastSeen}});
@@ -28,7 +31,10 @@ if (Meteor.isClient) {
     },
     "mousedown #body": function(evt) {
       var sessionId = Meteor.connection._lastSessionId;
-      var lastSeen = new Date();
+      if (!sessionId)
+        return;
+
+      var lastSeen = Session.get("date");
       var c = Cursors.findOne(sessionId);
       if (c)
         Cursors.update(sessionId, {$set: {clicking: true, lastSeen: lastSeen}});
@@ -36,11 +42,14 @@ if (Meteor.isClient) {
       var fill = window.fill(sessionId);
       var x = evt.clientX - 100;
       var y = evt.clientY - 100;
-      Gradients.insert({createdOn: new Date(), x: x, y: y, fill: fill});
+      Gradients.insert({createdOn: Session.get("date"), x: x, y: y, fill: fill});
     },
     "mouseup #body": function(evt) {
       var sessionId = Meteor.connection._lastSessionId;
-      var lastSeen = new Date();
+      if (!sessionId)
+        return;
+
+      var lastSeen = Session.get("date");
       var c = Cursors.findOne(sessionId);
       if (c)
         Cursors.update(sessionId, {$set: {clicking: false, lastSeen: lastSeen}});
@@ -50,6 +59,8 @@ if (Meteor.isClient) {
   Template.name.events({
     "input #name input": function(evt) {
       var sessionId = Meteor.connection._lastSessionId;
+      if (!sessionId)
+        return;
       Cursors.update(sessionId, {$set: {name: $(evt.target).val()}});
     }
   });
@@ -70,12 +81,9 @@ if (Meteor.isClient) {
     if (age > 2)  return 0.3;
     return 0.35;
   }
-  Template.gradients.delay = function() {
-    return Math.random() * 5;
-  }
 
   Template.cursors.cursor = function() {
-    return Cursors.find({lastSeen: {$gte: new Date(new Date() - 1000 * 42)}});
+    return Cursors.find({lastSeen: {$gte: new Date(Session.get("date") - 1000 * 42)}});
   }
   Template.cursors.fill = function() {
     return fill(this._id);
@@ -128,9 +136,6 @@ if (Meteor.isClient) {
 
 if (Meteor.isServer) {
   Meteor.startup(function() {
-    if (Cursors.find().count() > 100) {
-      Cursors.remove({});
-    }
     Meteor.setInterval(function() {
       Cursors.remove({lastSeen: {$lt: new Date(new Date() - 1000 * 3600)}});
       Gradients.remove({createdOn: {$lt: new Date(new Date() - 1000 * 300)}});
