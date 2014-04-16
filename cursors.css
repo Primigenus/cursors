@@ -12,7 +12,7 @@ html, body {
   color: white;
   -webkit-font-smoothing: antialiased;
   font-size: 11px;
-  -webkit-transition: background-color linear 5s;
+  -webkit-transition: background-color linear 12s;
 }
 #logo img {
   position: absolute;
@@ -34,6 +34,9 @@ html, body {
   font: 16px "Helvetica Neue", Helvetica, Arial, sans-serif;
   -webkit-font-smoothing: antialiased;
   text-shadow: 0 1px rgba(0,0,0,.3);
+}
+#name input:focus {
+  outline: none;
 }
 #name input::-webkit-input-placeholder {
   color: white;
