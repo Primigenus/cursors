@@ -1,0 +1,15 @@
+{
+  "meteor": {},
+  "dependencies": {
+    "basePackages": {
+      "apm": {}
+    },
+    "packages": {
+      "apm": {
+        "git": "https://github.com/arunoda/meteor-apm-client.git",
+        "tag": "v1.2.5",
+        "commit": "c4552ec9c2d011604729af42d66d8c896aaa77d4"
+      }
+    }
+  }
+}

@@ -4,11 +4,13 @@ Meteor.startup(function() {
 
     $("#name input").focus();
     Session.setDefault("date", new Date());
-    Meteor.setInterval(function() {
-      Meteor.call("getServerTime", function(err, res) {
-        Session.set("date", res);
-      });
-    }, 1000);
+    Meteor.call("getServerTime", function(err, res) {
+      Session.set("date", res);
+      Meteor.setInterval(function() {
+        Session.set("date", new Date(+Session.get("date") + 1000));
+      }, 1000);
+    });
+
   });
 
   UI.body.fill = function() {
@@ -18,6 +20,7 @@ Meteor.startup(function() {
     return fill;
   }
 
+  var throttleUpdate;
   UI.body.events({
     "mousemove #body": function(evt) {
       var sessionId = Meteor.connection._lastSessionId;
@@ -27,8 +30,13 @@ Meteor.startup(function() {
       var x = evt.clientX;
       var y = evt.clientY;
       var c = Cursors.findOne(sessionId);
-      if (c)
-        Meteor.call("updateCursor", sessionId, x, y);
+
+      if (c) {
+        throttleUpdate = throttleUpdate || _.throttle(function(sessionId, x, y) {
+          Cursors.update(sessionId, {$set: {x: x, y: y}});
+        }, 42);
+        throttleUpdate(sessionId, x, y);
+      }
       else
         Meteor.call("createCursor", sessionId, x, y);
     },
@@ -44,7 +52,7 @@ Meteor.startup(function() {
       var fill = window.fill(sessionId);
       var x = evt.clientX - 100;
       var y = evt.clientY - 100;
-      Meteor.call("createGradient", sessionId, x, y, fill)
+      Gradients.insert({createdBy: sessionId, x: x, y: y, fill: fill});
     },
     "mouseup #body": function(evt) {
       var sessionId = Meteor.connection._lastSessionId;
