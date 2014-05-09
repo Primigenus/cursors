@@ -4,7 +4,6 @@ html, body {
   font-family: Arial;
   overflow: hidden;
   -webkit-user-select: none;
-  cursor: none;
 }
 #body {
   width: 100%; height: 100%;
@@ -55,7 +54,6 @@ html, body {
   z-index: 99;
   pointer-events: none;
   width: 28px; height: 40px;
-  -webkit-transition: linear .042s;
 }
 .point { -webkit-transform: translateX(-5px) translateY(-4px); }
 .click { -webkit-transform: translateX(-14px) translateY(-12px); }
