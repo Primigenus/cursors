@@ -58,5 +58,8 @@ Meteor.methods({
   },
   createGradient: function(sessionId, x, y, fill) {
     Gradients.insert({createdBy: sessionId, createdOn: new Date(), x: x, y: y, fill: fill});
+  },
+  removeCursor: function(sessionId) {
+    Cursors.remove(sessionId);
   }
 })

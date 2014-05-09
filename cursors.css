@@ -79,6 +79,7 @@ html, body {
 
 .gradient {
   width: 200px; height: 200px;
+  border-radius: 50%;
   position: absolute;
   opacity: .2;
   -webkit-transition: opacity linear 1s;

@@ -62,6 +62,10 @@ UI.body.events({
     var c = Cursors.findOne(sessionId);
     if (c)
       Meteor.call("updateCursorClick", sessionId, false);
+  },
+  "click a": function() {
+    var sessionId = Meteor.connection._lastSessionId;
+    Meteor.call("removeCursor", sessionId);
   }
 });
 
