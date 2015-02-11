@@ -1,5 +1,5 @@
 Meteor.startup(function() {
-  Apm.connect("swmtn8Fo93uafiH7T", "858fa783-61af-4f8a-aa5a-37bf6f13b796");
+  Kadira.connect("swmtn8Fo93uafiH7T", "858fa783-61af-4f8a-aa5a-37bf6f13b796");
 
   Meteor.publish("cursors", function() {
     return Cursors.find({lastSeen: {$gte: new Date(new Date() - 1000 * 42)}});

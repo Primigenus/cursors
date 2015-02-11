@@ -1,2 +1,2 @@
-Cursors = new Meteor.Collection("cursors");
-Gradients = new Meteor.Collection("gradients");
+Cursors = new Mongo.Collection("cursors");
+Gradients = new Mongo.Collection("gradients");
