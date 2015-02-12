@@ -3,6 +3,10 @@ Meteor.startup(function() {
   Meteor.subscribe("gradients");
 
   $("#name input").focus();
+
+  Session.setDefault("mousedown", false);
+  Session.setDefault("color", "#abcdef");
+
   Session.setDefault("date", new Date());
   Meteor.call("getServerTime", function(err, res) {
     Session.set("date", res);
@@ -19,6 +23,9 @@ Template.body.helpers({
     var date = Session.get('date');
     var fill = window.fill(sessionId, +date);
     return fill;
+  },
+  color: function() {
+    return Session.get("color");
   }
 });
 
@@ -31,18 +38,29 @@ Template.body.events({
 
     var x = evt.clientX;
     var y = evt.clientY;
-    var c = Cursors.findOne(sessionId);
 
-    if (c) {
-      throttleUpdate = throttleUpdate || _.throttle(function(sessionId, x, y) {
-        Cursors.update(sessionId, {$set: {x: x, y: y}});
-      }, 42);
-      throttleUpdate(sessionId, x, y);
+    if (Session.get("mousedown")) {
+      var fill = window.fill(sessionId);
+      x = x - 24;
+      y = y - 24;
+      Gradients.insert({createdBy: sessionId, x: x, y: y, fill: fill});
     }
-    else
-      Meteor.call("createCursor", sessionId, x, y);
+    else {
+      var c = Cursors.findOne(sessionId);
+
+      if (c) {
+        throttleUpdate = throttleUpdate || _.throttle(function(sessionId, x, y) {
+          Cursors.update(sessionId, {$set: {x: x, y: y}});
+        }, 42);
+        throttleUpdate(sessionId, x, y);
+      }
+      else
+        Meteor.call("createCursor", sessionId, x, y);
+    }
   },
   "mousedown #body": function(evt) {
+    Session.set("mousedown", true);
+
     var sessionId = Meteor.connection._lastSessionId;
     if (!sessionId)
       return;
@@ -52,11 +70,13 @@ Template.body.events({
       Meteor.call("updateCursorClick", sessionId, true);
 
     var fill = window.fill(sessionId);
-    var x = evt.clientX - 100;
-    var y = evt.clientY - 100;
+    var x = evt.clientX - 24;
+    var y = evt.clientY - 24;
     Gradients.insert({createdBy: sessionId, x: x, y: y, fill: fill});
   },
   "mouseup #body": function(evt) {
+    Session.set("mousedown", false);
+
     var sessionId = Meteor.connection._lastSessionId;
     if (!sessionId)
       return;
@@ -91,13 +111,11 @@ Template.gradients.helpers({
   },
   opacity: function() {
     var age = (+Session.get("date") - +this.createdOn) / 1000;
-    if (age > 30) return 0;
-    if (age > 25) return 0.1;
-    if (age > 20) return 0.15;
-    if (age > 10) return 0.2;
-    if (age > 5)  return 0.25;
-    if (age > 2)  return 0.3;
-    return 0.35;
+    if (age > 2.8) return 0;
+    if (age > 2.5)  return 0.1;
+    if (age > 2)  return 0.2;
+    if (age > 1)  return 0.3;
+    return 0.5;
   }
 });
 
@@ -145,6 +163,19 @@ Template.cursors.helpers({
       }, 200);
     }
     return Meteor.connection._lastSessionId === this._id && this.clicking ? "clicking" : "";
+  }
+});
+
+Template.colorpicker.helpers({
+  color: function() {
+    return Session.get("color");
+  }
+});
+
+Template.colorpicker.events({
+  'input': function(evt) {
+    var color = evt.target.value;
+    Session.set("color", color);
   }
 });
 

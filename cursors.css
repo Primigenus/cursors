@@ -11,7 +11,7 @@ html, body {
   color: white;
   -webkit-font-smoothing: antialiased;
   font-size: 11px;
-  -webkit-transition: background-color linear 12s;
+  -webkit-transition: background-color linear 2s;
 }
 #logo img {
   position: absolute;
@@ -69,7 +69,7 @@ html, body {
   position: absolute;
   top: -50px; left: -50px;
   border-radius: 50%;
-  border: solid 1px rgba(255,255,255,.5);
+  border: solid 1px white;
 }
 
 @-webkit-keyframes expandFade {
@@ -78,9 +78,15 @@ html, body {
 }
 
 .gradient {
-  width: 200px; height: 200px;
+  width: 48px; height: 48px;
   border-radius: 50%;
   position: absolute;
   opacity: .2;
   -webkit-transition: opacity linear 1s;
+}
+
+#colorpicker {
+  position: absolute;
+  bottom: 30px;
+  right: 30px;
 }

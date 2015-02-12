@@ -11,12 +11,13 @@
 </head>
 
 <body>
-  <div id="body">
+  <div id="body" style="background-color: {{color}}">
     {{> cursors}}
     {{> gradients}}
   </div>
   <div id="logo"><a href="http://q42.com"><img src="http://static.q42.nl/images/q42-logo.svg"></a></div>
   {{> username}}
+  {{> colorpicker}}
 </body>
 
 <template name="gradients">
@@ -77,4 +78,8 @@
 
 <template name="username">
   <div id="name"><input type="text" placeholder="Your name?" value="{{name}}"></div>
+</template>
+
+<template name="colorpicker">
+  <div id="colorpicker"><input type="color" value="{{color}}"></div>
 </template>
