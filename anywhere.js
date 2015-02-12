@@ -1,2 +1,2 @@
 Cursors = new Mongo.Collection("cursors");
-Gradients = new Mongo.Collection("gradients");
+Brushes = new Mongo.Collection("gradients");

@@ -13,16 +13,17 @@
 <body>
   <div id="body" style="background-color: {{color}}">
     {{> cursors}}
-    {{> gradients}}
+    {{> brushes}}
   </div>
-  <div id="logo"><a href="http://q42.com"><img src="http://static.q42.nl/images/q42-logo.svg"></a></div>
+  {{> logo}}
+
   {{> username}}
   {{> colorpicker}}
 </body>
 
-<template name="gradients">
-  {{#each gradient}}
-    <div class="gradient" style="background: -webkit-radial-gradient(closest-corner, #{{fill}}, #{{fill}} 25%, transparent 70%); -webkit-transform: translateX({{x}}px) translateY({{y}}px); opacity: {{opacity}};"></div>
+<template name="brushes">
+  {{#each brush}}
+    <div class="brush" style="background: -webkit-radial-gradient(closest-corner, #{{fill}}, #{{fill}} 25%, transparent 70%); -webkit-transform: translateX({{x}}px) translateY({{y}}px); opacity: {{opacity}};"></div>
   {{/each}}
 </template>
 
@@ -74,6 +75,10 @@
       <div class="name">{{name}}</div>
     </div>
   {{/each}}
+</template>
+
+<template name="logo">
+  <div id="logo"><a href="http://q42.com"><img src="http://static.q42.nl/images/q42-logo.svg"></a></div>
 </template>
 
 <template name="username">

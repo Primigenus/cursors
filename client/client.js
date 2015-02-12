@@ -1,6 +1,6 @@
 Meteor.startup(function() {
   Meteor.subscribe("cursors");
-  Meteor.subscribe("gradients");
+  Meteor.subscribe("brushes");
 
   $("#name input").focus();
 
@@ -43,7 +43,7 @@ Template.body.events({
       var fill = window.fill(sessionId);
       x = x - 24;
       y = y - 24;
-      Gradients.insert({createdBy: sessionId, x: x, y: y, fill: fill});
+      Brushes.insert({createdBy: sessionId, x: x, y: y, fill: fill});
     }
     else {
       var c = Cursors.findOne(sessionId);
@@ -72,7 +72,7 @@ Template.body.events({
     var fill = window.fill(sessionId);
     var x = evt.clientX - 24;
     var y = evt.clientY - 24;
-    Gradients.insert({createdBy: sessionId, x: x, y: y, fill: fill});
+    Brushes.insert({createdBy: sessionId, x: x, y: y, fill: fill});
   },
   "mouseup #body": function(evt) {
     Session.set("mousedown", false);
@@ -105,9 +105,9 @@ Template.username.helpers({
   }
 });
 
-Template.gradients.helpers({
-  gradient: function() {
-    return Gradients.find();
+Template.brushes.helpers({
+  brush: function() {
+    return Brushes.find();
   },
   opacity: function() {
     var age = (+Session.get("date") - +this.createdOn) / 1000;

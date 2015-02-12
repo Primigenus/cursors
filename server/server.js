@@ -4,13 +4,13 @@ Meteor.startup(function() {
   Meteor.publish("cursors", function() {
     return Cursors.find({lastSeen: {$gte: new Date(new Date() - 1000 * 42)}});
   });
-  Meteor.publish("gradients", function() {
-    return Gradients.find();
+  Meteor.publish("brushes", function() {
+    return Brushes.find();
   })
 
   Meteor.setInterval(function() {
     Cursors.remove({lastSeen: {$lt: new Date(new Date() - 1000 * 3600)}});
-    Gradients.remove({createdOn: {$lt: new Date(new Date() - 1000 * 300)}});
+    Brushes.remove({createdOn: {$lt: new Date(new Date() - 1000 * 300)}});
   }, 10000)
 
   Cursors.allow({
@@ -22,7 +22,7 @@ Meteor.startup(function() {
       return false;
     }
   });
-  Gradients.allow({
+  Brushes.allow({
     insert: function(userId, doc) {
       if (doc.createdBy && doc.x && doc.y && doc.fill) {
         doc.createdOn = new Date();
@@ -38,7 +38,7 @@ Meteor.startup(function() {
 Meteor.methods({
   clear: function() {
     Cursors.remove({});
-    Gradients.remove({});
+    Brushes.remove({});
   },
   getServerTime: function () {
     return new Date();
@@ -55,9 +55,6 @@ Meteor.methods({
   createCursor: function(sessionId, x, y) {
     if (!Cursors.findOne(sessionId))
       Cursors.insert({_id: sessionId, x: x, y: y, lastSeen: new Date()});
-  },
-  createGradient: function(sessionId, x, y, fill) {
-    Gradients.insert({createdBy: sessionId, createdOn: new Date(), x: x, y: y, fill: fill});
   },
   removeCursor: function(sessionId) {
     Cursors.remove(sessionId);
